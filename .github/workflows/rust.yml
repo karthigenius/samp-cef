@@ -18,19 +18,28 @@ jobs:
         os: [ubuntu-20.04, ubuntu-22.04]
 
     steps:
-    - name: Install nightly rust
+    - name: Install nightly rust for 20.04
+      if: env.UBUNTU_VERSION == '20.04'
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: nightly-i686-unknown-linux-gnu
+        toolchain: stable-i686-unknown-linux-gnu
         override: true
-    
+        
+    - name: Install nightly rust for 22.04
+      if: env.UBUNTU_VERSION == '22.04'
+      uses: actions-rs/toolchain@v1.0.6
+      with:
+        toolchain: nightly-x86_64-unknown-linux-gnu
+        target: stable-i686-unknown-linux-gnu
+        override: true
+
     - name: Install i386 deps
       run: |
         sudo dpkg --add-architecture i386 
         sudo apt-get update 
         sudo apt-get install build-essential g++-multilib -y
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Build server plugin
       run: |
         cargo build --package server --release
